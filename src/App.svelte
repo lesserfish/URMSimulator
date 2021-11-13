@@ -1,6 +1,6 @@
 <script>
-import { onMount } from "svelte";
-import Command from "./Components/Command.svelte"
+  import { onMount } from "svelte";
+  import Command from "./Components/Command.svelte";
 
   class cmd {
     constructor(_instruction, _arg1 = "", _arg2 = "", _arg3 = "") {
@@ -16,7 +16,7 @@ import Command from "./Components/Command.svelte"
   let CommandID = 0;
   let running = false;
   let timeout = 250;
-  let RunAllText = "Run All";
+  let RunAllText = "Start";
   function increaseValue(i) {
     states[i] = states[i] + 1;
     states = states;
@@ -40,56 +40,43 @@ import Command from "./Components/Command.svelte"
     states.pop();
     states = states;
   }
-  function checkValidity(inst, a1, a2, a3)
-  {
-    if(inst == "Z")
-    {
-      try{
+  function checkValidity(inst, a1, a2, a3) {
+    if (inst == "Z") {
+      try {
         parseInt(a1);
-      } catch(e)
-      {
+      } catch (e) {
         return false;
       }
-        return true;
-    }
-    else if(inst == "S")
-    {
-      try{
+      return true;
+    } else if (inst == "S") {
+      try {
         parseInt(a1);
-      } catch(e)
-      {
+      } catch (e) {
         return false;
       }
-        return true;
-    }
-    else if(inst == "T")
-    {
-      try{
+      return true;
+    } else if (inst == "T") {
+      try {
         parseInt(a1);
         parseInt(a2);
-      } catch(e)
-      {
+      } catch (e) {
         return false;
       }
-        return true;
-    }
-    else if(inst == "J")
-    {
-      try{
+      return true;
+    } else if (inst == "J") {
+      try {
         parseInt(a1);
         parseInt(a2);
         parseInt(a3);
-      } catch(e)
-      {
+      } catch (e) {
         return false;
       }
-        return true;
-    }
-    else{
+      return true;
+    } else {
       return false;
     }
   }
-  function getCmdString(instruction, arg1, arg2, arg3){
+  function getCmdString(instruction, arg1, arg2, arg3) {
     let o = instruction + "(";
     o = arg1 == "" ? o : o + arg1;
     o = arg2 == "" ? o : o + "," + arg2;
@@ -97,25 +84,22 @@ import Command from "./Components/Command.svelte"
     o = o + ")";
     return o;
   }
-  function insertCommand(command)
-  {
+  function insertCommand(command) {
     let commandArray = command.split(/[(,)]/);
     let instruction = commandArray.length >= 1 ? commandArray[0] : "";
     let arg1 = commandArray.length >= 2 ? commandArray[1] : "";
     let arg2 = commandArray.length >= 3 ? commandArray[2] : "";
     let arg3 = commandArray.length >= 4 ? commandArray[3] : "";
 
-    if(checkValidity(instruction, arg1, arg2, arg3))
-    {
+    if (checkValidity(instruction, arg1, arg2, arg3)) {
       let new_cmd = new cmd(instruction, arg1, arg2, arg3);
       Commands.push(new_cmd);
     }
     Commands = Commands;
   }
-  function handleInput(event)
-  {
-    if(event.keyCode == 13 || event == "forced") // Enter
-    {
+  function handleInput(event) {
+    if (event.keyCode == 13 || event == "forced") {
+      // Enter
       let input = document.getElementById("cmd-input");
       let text = input.value;
       insertCommand(text);
@@ -127,10 +111,8 @@ import Command from "./Components/Command.svelte"
       nextCommand();
       setTimeout(runAll, timeout);
     }
-    
   }
   function nextCommand() {
-
     if (CommandID >= Commands.length || Commands.length == 0) {
       RunAllText = "Run all";
       running = false;
@@ -169,9 +151,7 @@ import Command from "./Components/Command.svelte"
         if (states[idy] == states[idx]) {
           CommandID = idz;
           states = states;
-        }
-        else
-        {
+        } else {
           CommandID++;
         }
       }
@@ -179,55 +159,72 @@ import Command from "./Components/Command.svelte"
       CommandID++;
     }
   }
-  function deleteCommand(idx)
-  {
+  function deleteCommand(idx) {
     Commands.splice(idx, 1);
     Commands = Commands;
   }
-  function selectCommand(idx)
-  {
+  function selectCommand(idx) {
     CommandID = idx;
   }
   onMount(() => {
-    Commands = [new cmd("J", "0", "2", "10"),
-                new cmd("S", "2"),
-                new cmd("Z", "3"),
-                new cmd("J", "1","3","7"),
-                new cmd("S","5"),
-                new cmd("S","3"),
-                new cmd("J","0","0","3"),
-                new cmd("J","0","0","0")];
-
+    Commands = [
+      new cmd("J", "0", "2", "10"),
+      new cmd("S", "2"),
+      new cmd("Z", "3"),
+      new cmd("J", "1", "3", "7"),
+      new cmd("S", "5"),
+      new cmd("S", "3"),
+      new cmd("J", "0", "0", "3"),
+      new cmd("J", "0", "0", "0"),
+    ];
   });
 </script>
 
 <div class="container">
   <div class="columns">
-    <div class="column col-12 centered title text-secondary"><h1>Ｕ　Ｒ　Ｍ</h1></div>
+    <div class="column col-12 centered title text-secondary">
+      <h1>Ｕ　Ｒ　Ｍ</h1>
+    </div>
   </div>
   <div class="columns text-center">
     <div class="column col-12">
-    <div class="commandTiles">
-      {#each Commands as thisCommand, i}
-        <Command command={thisCommand} 
-        ID={i} 
-        deleteButton={deleteCommand} 
-        selectButton={selectCommand} 
-        bind:currentStep={CommandID}/>
-      {/each}
+      <div class="commandTiles">
+        {#each Commands as thisCommand, i}
+          <Command
+            command={thisCommand}
+            ID={i}
+            deleteButton={deleteCommand}
+            selectButton={selectCommand}
+            bind:currentStep={CommandID}
+          />
+        {/each}
+      </div>
     </div>
   </div>
-</div>
   <div class="columns">
     <div class="column col">
-        <label class="form-label text-center" for="command-input"
-          >Commands:</label>
+      <label class="form-label text-center" for="command-input">Commands:</label
+      >
     </div>
   </div>
   <div class="columns">
-    <div class="column col text-center" style="margin-left:25%;margin-right: 25%;">
-        <input class="form-input" type="text" id="cmd-input" on:keypress={handleInput}>
-        <button class="btn col btn-action" style="margin-top: 10px;"on:click={() => {handleInput("forced")}}>Go</button>
+    <div
+      class="column col text-center"
+      style="margin-left:25%;margin-right: 25%;"
+    >
+      <input
+        class="form-input"
+        type="text"
+        id="cmd-input"
+        on:keypress={handleInput}
+      />
+      <button
+        class="btn col btn-action"
+        style="margin-top: 10px;"
+        on:click={() => {
+          handleInput("forced");
+        }}>Add</button
+      >
     </div>
   </div>
   <div class="columns">
@@ -236,7 +233,7 @@ import Command from "./Components/Command.svelte"
         class="btn btn-primary"
         on:click={async () => {
           if (running) {
-            RunAllText = "Run all";
+            RunAllText = "Start";
             running = false;
           } else {
             RunAllText = "Stop";
@@ -248,7 +245,14 @@ import Command from "./Components/Command.svelte"
         {RunAllText}</button
       >
       <button class="btn btn-primary" on:click={nextCommand}> Next</button>
-      <button class="btn btn-primary" on:click={() => {CommandID = 0;}}> Reset</button>  
+      <button
+        class="btn btn-primary"
+        on:click={() => {
+          CommandID = 0;
+        }}
+      >
+        Reset</button
+      >
       <div class="popover popover-right hint">
         <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
@@ -257,20 +261,27 @@ import Command from "./Components/Command.svelte"
               <h6>What is this?</h6>
             </div>
             <div class="card-body">
-                <p>The Unlimited Register Machine (URM) is a theoretical machine specified in Nigel J. Cutland's book, <i>"Computability: An introduction to recursive function theory"</i></p>
-                <p>The machine allows 4 instructions: </p>
-                <ul>
-                  <li>S(n): Increments register n by 1.</li>
-                  <li>T(m, n): Copies register m to register n.</li>
-                  <li>Z(n): Sets register n to 0.</li>
-                  <li>J(m,n,i): If register m is equal to register n, jump to instruction i.</li>
-                </ul>
-                <p>Try giving it a shot.</p>
-              </div>
+              <p>
+                The Unlimited Register Machine (URM) is a theoretical machine
+                specified in Nigel J. Cutland's book, <i
+                  >"Computability: An introduction to recursive function theory"</i
+                >
+              </p>
+              <p>The machine allows 4 instructions:</p>
+              <ul>
+                <li>S(n): Increments register n by 1.</li>
+                <li>T(m, n): Copies register m to register n.</li>
+                <li>Z(n): Sets register n to 0.</li>
+                <li>
+                  J(m,n,i): If register m is equal to register n, jump to
+                  instruction i.
+                </li>
+              </ul>
+              <p>Try giving it a shot.</p>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
   <div class="columns" style="margin-bottom: 10em;">
@@ -283,8 +294,12 @@ import Command from "./Components/Command.svelte"
           }}>{s}</button
         >
       {/each}
-      <button class="btn btn-action btn-primary plus" on:click={addState}>＋</button>
-      <button class="btn btn-action btn-primary" on:click={removeState}>ー</button>
+      <button class="btn btn-action btn-primary plus" on:click={addState}
+        >＋</button
+      >
+      <button class="btn btn-action btn-primary" on:click={removeState}
+        >ー</button
+      >
       <div class="popover popover-right first-help">
         <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
@@ -293,14 +308,19 @@ import Command from "./Components/Command.svelte"
               <h6>What is this?</h6>
             </div>
             <div class="card-body">
-              <p> Left clicking and middle clicking on the registers to your left increase and decrease their values.</p> 
-              <p>The plus and minus buttons to the right add and remove registers. </p>
+              <p>
+                Left clicking and middle clicking on the registers to your left
+                increase and decrease their values.
+              </p>
+              <p>
+                The plus and minus buttons to the right add and remove
+                registers.
+              </p>
               <p>Have fun!</p>
-              </div>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -311,17 +331,10 @@ import Command from "./Components/Command.svelte"
     justify-content: center;
     display: inline-block;
   }
-  .cmd-input {
-    margin-left: 30%;
-    margin-right: 30%;
-  }
-  .commandTiles{
+  .commandTiles {
     overflow-y: auto;
-    height:auto !important;
+    height: auto !important;
     max-height: 24em;
-  }
-  .commands{
-    text-align: center;
   }
   .output {
     margin-top: 1%;
@@ -333,24 +346,20 @@ import Command from "./Components/Command.svelte"
     margin-left: 0.25%;
     margin-right: 0.25%;
   }
-  .console {
-    margin-top: 1%;
-  }
-  .hint{
+  .hint {
     margin-left: 1%;
   }
-  .info{
+  .info {
     overflow-y: auto;
   }
-  .plus{
-    margin-left:0.5%;
+  .plus {
+    margin-left: 0.5%;
   }
-  .first-help{
-    margin-left:1%;
+  .first-help {
+    margin-left: 1%;
   }
-  .title{
-    margin-top:1%;
+  .title {
+    margin-top: 1%;
     margin-bottom: 0;
   }
-
 </style>
