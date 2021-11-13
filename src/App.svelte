@@ -1,6 +1,6 @@
 <script>
 import { onMount } from "svelte";
-
+import Command from "./Components/Command.svelte"
 
   class cmd {
     constructor(original, _instruction, _arg1 = "", _arg2 = "", _arg3 = "") {
@@ -61,6 +61,80 @@ import { onMount } from "svelte";
     CommandID = CommandID;
     CommandText = Commands[CommandID].string;
   }
+  function checkValidity(inst, a1, a2, a3)
+  {
+    if(inst == "Z")
+    {
+      try{
+        parseInt(a1);
+      } catch(e)
+      {
+        return false;
+      }
+        return true;
+    }
+    else if(inst == "S")
+    {
+      try{
+        parseInt(a1);
+      } catch(e)
+      {
+        return false;
+      }
+        return true;
+    }
+    else if(inst == "T")
+    {
+      try{
+        parseInt(a1);
+        parseInt(a2);
+      } catch(e)
+      {
+        return false;
+      }
+        return true;
+    }
+    else if(inst == "J")
+    {
+      try{
+        parseInt(a1);
+        parseInt(a2);
+        parseInt(a3);
+      } catch(e)
+      {
+        return false;
+      }
+        return true;
+    }
+    else{
+      return false;
+    }
+  }
+  function insertCommand(command)
+  {
+    let commandArray = command.split(/[(,)]/);
+    let instruction = commandArray.length >= 1 ? commandArray[0] : "";
+    let arg1 = commandArray.length >= 2 ? commandArray[1] : "";
+    let arg2 = commandArray.length >= 3 ? commandArray[2] : "";
+    let arg3 = commandArray.length >= 4 ? commandArray[3] : "";
+
+    if(checkValidity(instruction, arg1, arg2, arg3))
+    {
+      let new_cmd = new cmd(command, instruction, arg1, arg2, arg3);
+      Commands.push(new_cmd);
+    }
+    Commands = Commands;
+  }
+  function handleInput(event)
+  {
+    if(event.keyCode == 13 || event == "forced") // Enter
+    {
+      let input = document.getElementById("cmd-input");
+      let text = input.value;
+      insertCommand(text);
+      input.value = "";
+    }
+  }
   async function runAll() {
     if (running) {
       nextCommand();
@@ -70,6 +144,9 @@ import { onMount } from "svelte";
   }
   function nextCommand() {
     //	try{
+    if(Commands.length == 0){
+      return;
+    }
     let CurrentCommand = Commands[CommandID];
     if (CurrentCommand.instruction == "Z") {
       let idx = parseInt(CurrentCommand.arg1);
@@ -112,12 +189,22 @@ import { onMount } from "svelte";
     }
 
     if (CommandID >= Commands.length) {
-      CommandID = 0;
+      RunAllText = "Run all";
+      running = false;
+      //CommandID = 0;
     }
     CommandText = Commands[CommandID].string;
 
   }
-
+  function deleteCommand(idx)
+  {
+    Commands.splice(idx, 1);
+    Commands = Commands;
+  }
+  function selectCommand(idx)
+  {
+    CommandID = idx;
+  }
   onMount( () => {
     updateCommands();
   });
@@ -127,21 +214,29 @@ import { onMount } from "svelte";
   <div class="columns">
     <div class="column col-12 centered title text-secondary"><h1>Ｕ　Ｒ　Ｍ</h1></div>
   </div>
+  <div class="columns text-center">
+    <div class="column col-12">
+    <div class="commandTiles">
+      {#each Commands as thisCommand, i}
+        <Command command={thisCommand} 
+        ID={i} 
+        deleteButton={deleteCommand} 
+        selectButton={selectCommand} 
+        bind:currentStep={CommandID}/>
+      {/each}
+    </div>
+  </div>
+</div>
   <div class="columns">
     <div class="column col">
-      <div class="form-group col commands">
         <label class="form-label text-center" for="command-input"
-          >Commands:</label
-        >
-        <textarea
-          class="form-input"
-          id="command-input"
-          placeholder=""
-          rows="8"
-          bind:value={CommandForm}
-          on:change={updateCommands}
-        />
-      </div>
+          >Commands:</label>
+    </div>
+  </div>
+  <div class="columns">
+    <div class="column col text-center" style="margin-left:25%;margin-right: 25%;">
+        <input class="form-input" type="text" id="cmd-input" on:keypress={handleInput}>
+        <button class="btn col btn-action" style="margin-top: 10px;"on:click={() => {handleInput("forced")}}>Go</button>
     </div>
   </div>
   <div class="columns">
@@ -162,7 +257,7 @@ import { onMount } from "svelte";
         {RunAllText}</button
       >
       <button class="btn btn-primary" on:click={nextCommand}> Next</button>
-      <button class="btn btn-primary" on:click={() => {(CommandID = 0); CommandText = Commands[CommandID].string;}}> Reset</button>  
+      <button class="btn btn-primary" on:click={() => {if(Commands.length == 0){return;}(CommandID = 0); CommandText = Commands[CommandID].string;}}> Reset</button>  
       <div class="popover popover-right hint">
         <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
@@ -187,12 +282,7 @@ import { onMount } from "svelte";
 
     </div>
   </div>
-  <div class="columns">
-    <div class="column col text-center console">
-      <p>Current command({CommandID}): {CommandText}</p>
-    </div>
-  </div>
-  <div class="columns">
+  <div class="columns" style="margin-bottom: 10em;">
     <div class="column col text-center output">
       {#each states as s, i}
         <button
@@ -230,15 +320,23 @@ import { onMount } from "svelte";
     justify-content: center;
     display: inline-block;
   }
-  .commands {
+  .cmd-input {
     margin-left: 30%;
     margin-right: 30%;
+  }
+  .commandTiles{
+    overflow-y: auto;
+    height:auto !important;
+    max-height: 24em;
+  }
+  .commands{
+    text-align: center;
   }
   .output {
     margin-top: 1%;
   }
   .action {
-    margin-top: 5%;
+    margin-top: 1%;
   }
   .action > .btn {
     margin-left: 0.25%;
