@@ -125,7 +125,7 @@ import { onMount } from "svelte";
 
 <div class="container">
   <div class="columns">
-    <div class="column col-12 centered title"><h1>Ｕ　Ｒ　Ｍ</h1></div>
+    <div class="column col-12 centered title text-secondary"><h1>Ｕ　Ｒ　Ｍ</h1></div>
   </div>
   <div class="columns">
     <div class="column col">
@@ -147,7 +147,7 @@ import { onMount } from "svelte";
   <div class="columns">
     <div class="column col text-center action">
       <button
-        class="btn"
+        class="btn btn-primary"
         on:click={async () => {
           if (running) {
             RunAllText = "Run all";
@@ -161,10 +161,10 @@ import { onMount } from "svelte";
       >
         {RunAllText}</button
       >
-      <button class="btn" on:click={nextCommand}> Next</button>
-      <button class="btn" on:click={() => {(CommandID = 0); CommandText = Commands[CommandID].string;}}> Reset</button>  
+      <button class="btn btn-primary" on:click={nextCommand}> Next</button>
+      <button class="btn btn-primary" on:click={() => {(CommandID = 0); CommandText = Commands[CommandID].string;}}> Reset</button>  
       <div class="popover popover-right hint">
-        <button class="btn btn-action">?</button>
+        <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
           <div class="card info">
             <div class="card-header">
@@ -202,17 +202,19 @@ import { onMount } from "svelte";
           }}>{s}</button
         >
       {/each}
-      <button class="btn btn-action plus" on:click={addState}>+</button>
-      <button class="btn btn-action" on:click={removeState}>-</button>
+      <button class="btn btn-action btn-primary plus" on:click={addState}>＋</button>
+      <button class="btn btn-action btn-primary" on:click={removeState}>ー</button>
       <div class="popover popover-right first-help">
-        <button class="btn btn-action">?</button>
+        <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
           <div class="card info">
             <div class="card-header">
               <h6>What is this?</h6>
             </div>
             <div class="card-body">
-              <p> Left clicking and middle clicking on the registers to your left increase and decrease their values. Give it a shot!</p>
+              <p> Left clicking and middle clicking on the registers to your left increase and decrease their values.</p> 
+              <p>The plus and minus buttons to the right add and remove registers. </p>
+              <p>Have fun!</p>
               </div>
           </div>
         </div>
@@ -259,6 +261,7 @@ import { onMount } from "svelte";
   }
   .title{
     margin-top:1%;
+    margin-bottom: 0;
   }
 
 </style>
