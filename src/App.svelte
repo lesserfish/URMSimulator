@@ -3,23 +3,20 @@ import { onMount } from "svelte";
 import Command from "./Components/Command.svelte"
 
   class cmd {
-    constructor(original, _instruction, _arg1 = "", _arg2 = "", _arg3 = "") {
+    constructor(_instruction, _arg1 = "", _arg2 = "", _arg3 = "") {
       this.instruction = _instruction;
       this.arg1 = _arg1;
       this.arg2 = _arg2;
       this.arg3 = _arg3;
-      this.string = original;
+      this.string = getCmdString(_instruction, _arg1, _arg2, _arg3);
     }
   }
   let states = [3, 5, 0, 0, 0, 0];
-  let CommandForm = "J(0,2,10)\nS(2)\nZ(3)\nJ(1, 3, 7)\nS(5)\nS(3)\nJ(0,0,3)\nJ(0,0,0)";
   let Commands = [];
-  let CommandText = "";
   let CommandID = 0;
   let running = false;
   let timeout = 250;
   let RunAllText = "Run All";
-  let modalState = "";
   function increaseValue(i) {
     states[i] = states[i] + 1;
     states = states;
@@ -42,24 +39,6 @@ import Command from "./Components/Command.svelte"
   function removeState() {
     states.pop();
     states = states;
-  }
-  function updateCommands() {
-    Commands = [];
-    let cmd_array = CommandForm.split("\n");
-    for (let i = 0; i < cmd_array.length; i++) {
-      let _cmd = cmd_array[i];
-      let sections = _cmd.split(/[(,)]/);
-      let instruction = sections.length >= 1 ? sections[0] : "";
-      let arg1 = sections.length >= 2 ? sections[1] : "";
-      let arg2 = sections.length >= 3 ? sections[2] : "";
-      let arg3 = sections.length >= 4 ? sections[3] : "";
-
-      let new_cmd = new cmd(_cmd, instruction, arg1, arg2, arg3);
-      Commands.push(new_cmd);
-    }
-    Commands = Commands;
-    CommandID = CommandID;
-    CommandText = Commands[CommandID].string;
   }
   function checkValidity(inst, a1, a2, a3)
   {
@@ -110,6 +89,14 @@ import Command from "./Components/Command.svelte"
       return false;
     }
   }
+  function getCmdString(instruction, arg1, arg2, arg3){
+    let o = instruction + "(";
+    o = arg1 == "" ? o : o + arg1;
+    o = arg2 == "" ? o : o + "," + arg2;
+    o = arg3 == "" ? o : o + "," + arg3;
+    o = o + ")";
+    return o;
+  }
   function insertCommand(command)
   {
     let commandArray = command.split(/[(,)]/);
@@ -120,7 +107,7 @@ import Command from "./Components/Command.svelte"
 
     if(checkValidity(instruction, arg1, arg2, arg3))
     {
-      let new_cmd = new cmd(command, instruction, arg1, arg2, arg3);
+      let new_cmd = new cmd(instruction, arg1, arg2, arg3);
       Commands.push(new_cmd);
     }
     Commands = Commands;
@@ -139,13 +126,17 @@ import Command from "./Components/Command.svelte"
     if (running) {
       nextCommand();
       setTimeout(runAll, timeout);
-      console.log("Loop");
     }
+    
   }
   function nextCommand() {
-    //	try{
-    if(Commands.length == 0){
+
+    if (CommandID >= Commands.length || Commands.length == 0) {
+      RunAllText = "Run all";
+      running = false;
+      Commands = Commands;
       return;
+      //CommandID = 0;
     }
     let CurrentCommand = Commands[CommandID];
     if (CurrentCommand.instruction == "Z") {
@@ -187,14 +178,6 @@ import Command from "./Components/Command.svelte"
     } else {
       CommandID++;
     }
-
-    if (CommandID >= Commands.length) {
-      RunAllText = "Run all";
-      running = false;
-      //CommandID = 0;
-    }
-    CommandText = Commands[CommandID].string;
-
   }
   function deleteCommand(idx)
   {
@@ -205,8 +188,16 @@ import Command from "./Components/Command.svelte"
   {
     CommandID = idx;
   }
-  onMount( () => {
-    updateCommands();
+  onMount(() => {
+    Commands = [new cmd("J", "0", "2", "10"),
+                new cmd("S", "2"),
+                new cmd("Z", "3"),
+                new cmd("J", "1","3","7"),
+                new cmd("S","5"),
+                new cmd("S","3"),
+                new cmd("J","0","0","3"),
+                new cmd("J","0","0","0")];
+
   });
 </script>
 
@@ -257,7 +248,7 @@ import Command from "./Components/Command.svelte"
         {RunAllText}</button
       >
       <button class="btn btn-primary" on:click={nextCommand}> Next</button>
-      <button class="btn btn-primary" on:click={() => {if(Commands.length == 0){return;}(CommandID = 0); CommandText = Commands[CommandID].string;}}> Reset</button>  
+      <button class="btn btn-primary" on:click={() => {CommandID = 0;}}> Reset</button>  
       <div class="popover popover-right hint">
         <button class="btn btn-action disabled">?</button>
         <div class="popover-container">
