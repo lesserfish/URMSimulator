@@ -327,11 +327,15 @@
   <div class="columns">
     <div class="column col text-center">
       <a href="https://www.github.com/lesserfish" target="_blank">
-        <img src="images/GitHub-Mark/PNG/GitHub-Mark-Light-32px.png" alt="Github logo">
+        <img
+          src="images/GitHub-Mark/PNG/GitHub-Mark-Light-32px.png"
+          alt="Github logo"
+        />
       </a>
     </div>
+  </div>
 </div>
-</div>
+
 <style>
   .centered {
     text-align: center;
@@ -369,8 +373,7 @@
     margin-top: 1%;
     margin-bottom: 0;
   }
-  .main{
+  .main {
     margin-bottom: 50px;
   }
-
 </style>
