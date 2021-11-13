@@ -65,5 +65,9 @@ button:focus {
 */
 
 body{
-	background-color: black;
+	height: 100vh;
+	overflow:auto;
+}
+html{
+	overflow: auto;
 }

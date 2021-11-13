@@ -180,7 +180,7 @@
   });
 </script>
 
-<div class="container">
+<div class="container main">
   <div class="columns">
     <div class="column col-12 centered title text-secondary">
       <h1>Ｕ　Ｒ　Ｍ</h1>
@@ -284,7 +284,7 @@
       </div>
     </div>
   </div>
-  <div class="columns" style="margin-bottom: 10em;">
+  <div class="columns" style="margin-bottom:5%;">
     <div class="column col text-center output">
       {#each states as s, i}
         <button
@@ -323,8 +323,15 @@
       </div>
     </div>
   </div>
-</div>
 
+  <div class="columns">
+    <div class="column col text-center">
+      <a href="https://www.github.com/lesserfish" target="_blank">
+        <img src="images/GitHub-Mark/PNG/GitHub-Mark-Light-32px.png" alt="Github logo">
+      </a>
+    </div>
+</div>
+</div>
 <style>
   .centered {
     text-align: center;
@@ -362,4 +369,8 @@
     margin-top: 1%;
     margin-bottom: 0;
   }
+  .main{
+    margin-bottom: 50px;
+  }
+
 </style>
