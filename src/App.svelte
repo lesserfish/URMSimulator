@@ -93,7 +93,10 @@
 
     if (checkValidity(instruction, arg1, arg2, arg3)) {
       let new_cmd = new cmd(instruction, arg1, arg2, arg3);
-      Commands.push(new_cmd);
+      let idx = Math.min(CommandID + 1, Commands.length);
+      Commands.splice(idx, 0, new_cmd);
+      //Commands.push(new_cmd);
+      CommandID++;
     }
     Commands = Commands;
   }
